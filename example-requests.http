@@ -1,0 +1,62 @@
+### Health Check
+GET http://localhost:3000/health
+
+### Get UCP Profile
+GET http://localhost:3000/ucp/profile
+
+### Add Products
+POST http://localhost:3000/api/ucp/products
+Content-Type: application/json
+
+{
+  "products": [
+    {
+      "id": "prod-001",
+      "title": "Wireless Bluetooth Headphones",
+      "description": "Premium noise-cancelling wireless headphones with 30-hour battery life",
+      "price": {
+        "value": 149.99,
+        "currency": "USD"
+      },
+      "availability": "in_stock",
+      "imageUrl": "https://example.com/headphones.jpg",
+      "brand": "AudioTech",
+      "category": "Electronics > Audio",
+      "condition": "new"
+    },
+    {
+      "id": "prod-002",
+      "title": "Smart Watch Pro",
+      "description": "Fitness tracking smartwatch with heart rate monitor and GPS",
+      "price": {
+        "value": 299.99,
+        "currency": "USD"
+      },
+      "availability": "in_stock",
+      "brand": "TechWear",
+      "category": "Electronics > Wearables",
+      "condition": "new"
+    }
+  ]
+}
+
+### Get All Products
+GET http://localhost:3000/api/ucp/products
+
+### Get Single Product
+GET http://localhost:3000/api/ucp/products/prod-001
+
+### Update Product
+PUT http://localhost:3000/api/ucp/products/prod-001
+Content-Type: application/json
+
+{
+  "price": {
+    "value": 129.99,
+    "currency": "USD"
+  },
+  "availability": "out_of_stock"
+}
+
+### Delete Product
+DELETE http://localhost:3000/api/ucp/products/prod-002

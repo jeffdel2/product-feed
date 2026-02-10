@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <style type="text/css">
+      :root {
+        /* Light mode variables */
+        --bg-color: #f7f7f7;
+        --container-bg: #ffffff;
+        --text-color: #272727;
+        --header-bg: #f9f9f9;
+        --border-color: #e1e1e1;
+        --box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        --response-bg: #f9f9f9;
+        --response-box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        --error-color: #d32f2f;
+        --label-color: #333;
+        --link-color: #1976d2;
+        --link-bg: rgba(25, 118, 210, 0.08);
+        --link-hover-bg: rgba(25, 118, 210, 0.12);
+        --exception-bg: #e8f4fd;
+        --logo-fill: #000000;
+      }
+      
+      @media (prefers-color-scheme: dark) {
+        :root {
+          /* Dark mode variables */
+          --bg-color: #121212;
+          --container-bg: #1e1e1e;
+          --text-color: #f0f0f0;
+          --header-bg: #252525;
+          --border-color: #383838;
+          --box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+          --response-bg: #252525;
+          --response-box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+          --error-color: #f44336;
+          --label-color: #d0d0d0;
+          --link-color: #64b5f6;
+          --link-bg: rgba(100, 181, 246, 0.08);
+          --link-hover-bg: rgba(100, 181, 246, 0.12);
+          --exception-bg: #263238;
+          --logo-fill: #f0f0f0;
+        }
+      }
+
+      html {
+        font-size: 87.5% !important;
+      }
+      
+      body {
+        font-family: "Inter", "-apple-system", "BlinkMacSystemFont", "Segoe UI",
+          "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue", sans-serif;
+        color: var(--text-color);
+        line-height: 1.5;
+        background-color: var(--bg-color);
+        margin: 0;
+        padding: 0;
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+      
+      /* Container styling */
+      #content-container {
+        background-color: var(--container-bg);
+        border-radius: 12px;
+        max-width: 600px;
+        margin: 3rem auto;
+        box-shadow: var(--box-shadow);
+        overflow: hidden;
+        transition: all 0.3s ease;
+      }
+      
+      /* Header styling */
+      #header {
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid var(--border-color);
+        text-align: center;
+        background-color: var(--header-bg);
+      }
+      
+      /* SVG logo styling */
+      #logo-svg {
+        max-width: 200px;
+        max-height: 40px;
+      }
+      
+      #logo-svg path {
+        fill: var(--logo-fill);
+        transition: fill 0.3s ease;
+      }
+      
+      /* Content container */
+      #content {
+        padding: 2rem;
+      }
+      
+      /* Typography */
+      h1, h2, h3, h4, h5, h6 {
+        font-family: "Aeonik", "Inter", "-apple-system", "BlinkMacSystemFont",
+          "Segoe UI", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue",
+          sans-serif;
+        margin: 0;
+      }
+      
+      /* Block message styling */
+      #block-message {
+        text-align: center;
+        margin-bottom: 2rem;
+        font-size: 1.1rem;
+        line-height: 1.6;
+      }
+      
+      /* Response box styling */
+      #response {
+        background-color: var(--response-bg);
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-top: 1.5rem;
+        box-shadow: var(--response-box-shadow);
+        border-left: 4px solid var(--error-color);
+      }
+      
+      .response-label {
+        display: flex;
+        margin: 0.7rem 0;
+        align-items: flex-start;
+      }
+      
+      .response-label strong {
+        min-width: 100px;
+        font-weight: 600;
+        color: var(--label-color);
+        display: inline-block;
+      }
+      
+      .response-label #user {
+        font-family: monospace;
+      }
+      
+      .response-label #url {
+        font-family: monospace;
+        word-break: break-all;
+      }
+      
+      .response-label #category {
+        font-weight: bold;
+        color: var(--error-color);
+      }
+      
+      #recategorize {
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+        font-size: 0.9rem;
+        text-align: center;
+        border-top: 1px solid var(--border-color);
+      }
+      
+      #recategorize a {
+        color: var(--link-color);
+        text-decoration: none;
+        font-weight: bold;
+        padding: 0.35rem 0.75rem;
+        border-radius: 4px;
+        background-color: var(--link-bg);
+        transition: background-color 0.2s ease;
+      }
+      
+      #recategorize a:hover {
+        background-color: var(--link-hover-bg);
+        text-decoration: underline;
+      }
+      
+      #exception-message {
+        margin-top: 1rem;
+        padding: 1rem;
+        background-color: var(--exception-bg);
+        border-radius: 6px;
+        font-size: 0.95rem;
+      }
+      
+      #exception-message a {
+        color: var(--link-color);
+        text-decoration: none;
+        font-weight: bold;
+      }
+
+      #exception-message a:hover {
+        text-decoration: underline;
+      }
+      
+      /* Main heading */
+      h2 {
+        font-size: 2rem;
+        color: var(--error-color);
+        margin-bottom: 1.5rem;
+        text-align: center;
+        font-weight: 500;
+        line-height: 1.2;
+      }
+
+      @media (max-width: 768px) {
+        #content-container {
+          margin: 1.5rem;
+          max-width: none;
+        }
+        
+        #content {
+          padding: 1.5rem;
+        }
+        
+        h2 {
+          font-size: 1.8rem;
+        }
+      }
+    </style>
+    <title>Okta | Blocked Page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex,nofollow" />
+
+    <link
+      rel="shortcut icon"
+      href="https://ok3static.oktacdn.com/bc/image/fileStoreRecord?id=fs01m2q975dMiRBKl1d8"
+      type="image/x-icon"
+    />
+    <script>
+      const user = String.raw `jeff.delong@okta.com`;
+      const url = String.raw `loremflickr.com/800/600/miniature-pony,horse`;
+      const category = String.raw `online-storage-and-backup`;
+    </script>
+  </head>
+  <body>
+    <div id="content-container">
+      <div id="header">
+        <svg id="logo-svg" version="1.0" xmlns="http://www.w3.org/2000/svg"
+         width="359pt" height="120pt" viewBox="0 0 359.000000 120.000000"
+         preserveAspectRatio="xMidYMid meet">
+
+        <g transform="translate(0.000000,120.000000) scale(0.100000,-0.100000)"
+        fill="currentColor" stroke="none">
+        <path d="M1380 600 l0 -410 60 0 60 0 0 130 0 130 24 0 c20 0 46 -27 127 -130
+        l102 -130 79 0 78 0 -133 167 -134 167 86 118 c47 65 92 127 100 138 13 19 11
+        20 -56 20 l-69 0 -79 -115 c-61 -88 -85 -115 -102 -115 l-23 0 0 220 0 220
+        -60 0 -60 0 0 -410z"/>
+        <path d="M1940 653 c0 -321 2 -362 18 -393 26 -52 70 -70 175 -70 l87 0 0 55
+        0 55 -60 0 c-98 0 -100 4 -100 215 l0 175 80 0 80 0 0 55 0 54 -77 3 -78 3 -3
+        103 -3 102 -59 0 -60 0 0 -357z"/>
+        <path d="M929 810 c-101 -17 -189 -85 -233 -179 -30 -67 -29 -197 2 -266 29
+        -63 83 -119 147 -153 43 -23 62 -27 135 -27 73 0 93 4 142 28 112 55 172 157
+        172 293 -1 195 -170 335 -365 304z m106 -121 c51 -14 110 -73 124 -124 18 -64
+        13 -109 -17 -166 -75 -144 -282 -127 -333 28 -28 87 6 198 74 238 58 34 94 40
+        152 24z"/>
+        <path d="M2493 810 c-222 -44 -320 -333 -175 -517 22 -27 62 -61 93 -78 47
+        -26 64 -30 134 -30 87 0 138 19 184 69 l25 26 13 -30 c15 -36 64 -60 123 -60
+        l40 0 0 54 c0 51 -1 54 -29 59 -18 4 -31 14 -35 29 -3 13 -6 123 -6 246 l0
+        222 -60 0 -60 0 0 -36 0 -36 -34 30 c-52 46 -137 66 -213 52z m169 -146 c93
+        -60 111 -215 35 -301 -78 -89 -211 -83 -284 13 -57 76 -38 231 36 283 63 45
+        148 47 213 5z"/>
+        </g>
+        </svg>
+      </div>
+      <div id="content">
+        <h2>Web Page Blocked</h2>
+        <div id="block-message">
+          <p>The web page you are trying to visit has been blocked due to its category.</p>
+        </div>
+        <div id="response">
+          <p class="response-label">
+            <strong>User:</strong><span id="user"></span>
+          </p>
+          <p class="response-label">
+            <strong>URL:</strong><span id="url"></span>
+          </p>
+          <p class="response-label">
+            <strong>Category:</strong><span id="category"></span>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Set content in the page
+      document.getElementById("user").innerText = user;
+      document.getElementById("url").innerText = url;
+      document.getElementById("category").innerText = category;
+
+      // Handle special categories
+      if (
+        category.includes("GLOBAL_BLOCK_URL_LIST") ||
+        category.includes("GLOBAL_BLOCK_URL_EDL")
+      ) {
+        document.getElementById("recategorize").innerHTML =
+          "No exceptions will be granted for websites in this Okta-defined category.";
+      } else if (
+        category.includes("artificial-intelligence") ||
+        category.includes("hacking") ||
+        category.includes("online-storage-and-backup") ||
+        category.includes("parked") ||
+        category.includes("peer-to-peer") ||
+        category.includes("social-networking") ||
+        category.includes("web-hosting") ||
+        category.includes("web-based-email")
+      ) {
+        const exceptionMessage = document.createElement("div");
+        exceptionMessage.id = "exception-message";
+        
+        // Create appropriate message based on category
+        if (category.includes("parked")) {
+          exceptionMessage.innerHTML =
+            'If you require access to this parked domain for business purposes, submit a <a href="test" id="exception-link">Lighthouse Request</a>.';
+        } else {
+          exceptionMessage.innerHTML =
+            "If you require access to " +
+            category +
+            ' websites for business purposes, submit a <a href="test" id="exception-link">Lighthouse Request</a>.';
+        }
+
+        // Insert message before response div
+        document.getElementById("block-message").appendChild(exceptionMessage);
+
+        // Set appropriate link based on category
+        let exceptionLink = "#";
+        const baseUrl = "https://okta.service-now.com/lighthouse?id=sc_cat_item&";
+        
+        // Set the appropriate link based on category
+        switch (category) {
+          case "artificial-intelligence":
+          case "hacking":
+          case "online-storage-and-backup":
+          case "parked":
+          case "peer-to-peer":
+          case "social-networking":
+          case "web-hosting":
+          case "web-based-email":
+            exceptionLink = `${baseUrl}sys_id=5c77dfaa97b60a10137e7c47f053af7d&sysparm_web_filtering_category=${category}`;
+            break;
+          default:
+            exceptionLink = `${baseUrl}sys_id=378dcdaddb3fcc505e9d341f9d96196a`;
+            break;
+        }
+        
+        document.getElementById("exception-link").href = exceptionLink;
+      }
+    </script>
+  </body>
+</html>
