@@ -1,0 +1,34 @@
+{
+  "products": [
+    {
+      "id": "pony-001",
+      "title": "Miniature Pony - Butterscotch",
+      "description": "Adorable miniature pony, perfect for children and small spaces. Gentle temperament, well-trained. Height: 34 inches",
+      "price": {
+        "value": 1500,
+        "currency": "USD"
+      },
+      "availability": "in_stock",
+      "link": "http://localhost:3001/products/pony-001",
+      "image_link": "http://localhost:3001/images/pony-001.jpg",
+      "brand": "Premium Ponies",
+      "category": "Livestock > Equine > Miniature",
+      "condition": "new"
+    },
+    {
+      "id": "pony-002",
+      "title": "Shetland Pony - Thunder",
+      "description": "Hardy Shetland pony with excellent temperament. Great for children and light riding. Height: 42 inches, 5 years old",
+      "price": {
+        "value": 2800,
+        "currency": "USD"
+      },
+      "availability": "in_stock",
+      "link": "http://localhost:3001/products/pony-002",
+      "image_link": "http://localhost:3001/images/pony-002.jpg",
+      "brand": "Highland Stables",
+      "category": "Livestock > Equine > Shetland",
+      "condition": "new"
+    }
+  ]
+}

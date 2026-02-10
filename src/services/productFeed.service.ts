@@ -1,9 +1,48 @@
 import { Product, ProductFeedResponse } from '../types/ucp.types';
+import * as fs from 'fs/promises';
+import * as path from 'path';
 
 class ProductFeedService {
   private products: Map<string, Product> = new Map();
+  private dataFilePath = path.join(__dirname, '../../data/products.json');
+  private initialized = false;
+
+  private async ensureInitialized(): Promise<void> {
+    if (!this.initialized) {
+      await this.loadData();
+      this.initialized = true;
+    }
+  }
+
+  private async loadData(): Promise<void> {
+    try {
+      const data = await fs.readFile(this.dataFilePath, 'utf-8');
+      const json = JSON.parse(data);
+      this.products.clear();
+      for (const product of json.products) {
+        this.products.set(product.id, product);
+      }
+      console.log(`Loaded ${this.products.size} products from file`);
+    } catch (error) {
+      console.log('No existing data file found or error reading file, starting with empty catalog');
+      this.products.clear();
+    }
+  }
+
+  private async saveData(): Promise<void> {
+    try {
+      const products = Array.from(this.products.values());
+      const data = JSON.stringify({ products }, null, 2);
+      await fs.mkdir(path.dirname(this.dataFilePath), { recursive: true });
+      await fs.writeFile(this.dataFilePath, data, 'utf-8');
+    } catch (error) {
+      console.error('Error saving data:', error);
+      throw new Error('Failed to save product data');
+    }
+  }
 
   async addProducts(products: Product[]): Promise<ProductFeedResponse> {
+    await this.ensureInitialized();
     const errors: Array<{ productId: string; error: string }> = [];
     let itemsProcessed = 0;
 
@@ -20,6 +59,8 @@ class ProductFeedService {
       }
     }
 
+    await this.saveData();
+
     return {
       success: errors.length === 0,
       message: errors.length === 0 ? 'All products processed successfully' : 'Some products failed to process',
@@ -29,14 +70,17 @@ class ProductFeedService {
   }
 
   async getProduct(productId: string): Promise<Product | null> {
+    await this.ensureInitialized();
     return this.products.get(productId) || null;
   }
 
   async getAllProducts(): Promise<Product[]> {
+    await this.ensureInitialized();
     return Array.from(this.products.values());
   }
 
   async updateProduct(productId: string, updates: Partial<Product>): Promise<Product | null> {
+    await this.ensureInitialized();
     const product = this.products.get(productId);
     if (!product) {
       return null;
@@ -45,11 +89,17 @@ class ProductFeedService {
     const updatedProduct = { ...product, ...updates, id: product.id };
     this.validateProduct(updatedProduct);
     this.products.set(productId, updatedProduct);
+    await this.saveData();
     return updatedProduct;
   }
 
   async deleteProduct(productId: string): Promise<boolean> {
-    return this.products.delete(productId);
+    await this.ensureInitialized();
+    const deleted = this.products.delete(productId);
+    if (deleted) {
+      await this.saveData();
+    }
+    return deleted;
   }
 
   private validateProduct(product: Product): void {
