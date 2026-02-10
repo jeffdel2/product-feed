@@ -1,28 +1,25 @@
 #!/bin/bash
 
-# Script to download horse/pony images for the product catalog
-# These are sample URLs - you may need to visit the sites and get actual download URLs
+# Script to download placeholder images for the product catalog
+# Using picsum.photos for reliable placeholder images
 
-echo "Downloading horse and pony images..."
+echo "Downloading placeholder images..."
 
 # Create images directory if it doesn't exist
 mkdir -p public/images
 
-# Using Lorem Picsum for placeholder images (different sizes for variety)
-# You can replace these with actual horse image URLs from Unsplash/Pexels
+# Download 800x600 placeholder images
+for i in {1..12}; do
+  # Format the number with leading zeros (001, 002, etc.)
+  num=$(printf "%03d" $i)
+  echo "Downloading pony-${num}.jpg..."
+  curl -L "https://picsum.photos/800/600" -o "public/images/pony-${num}.jpg"
+  sleep 0.5  # Be nice to the API
+done
 
-curl -L "https://loremflickr.com/800/600/miniature-pony,horse" -o public/images/pony-001.jpg
-curl -L "https://loremflickr.com/800/600/shetland-pony,horse" -o public/images/pony-002.jpg
-curl -L "https://loremflickr.com/800/600/welsh-pony,horse" -o public/images/pony-003.jpg
-curl -L "https://loremflickr.com/800/600/pony,white-horse" -o public/images/pony-004.jpg
-curl -L "https://loremflickr.com/800/600/connemara-pony,horse" -o public/images/pony-005.jpg
-curl -L "https://loremflickr.com/800/600/welsh-cob,horse" -o public/images/pony-006.jpg
-curl -L "https://loremflickr.com/800/600/quarter-horse,pony" -o public/images/pony-007.jpg
-curl -L "https://loremflickr.com/800/600/draft-horse,pony" -o public/images/pony-008.jpg
-curl -L "https://loremflickr.com/800/600/sport-horse,thoroughbred" -o public/images/pony-009.jpg
-curl -L "https://loremflickr.com/800/600/thoroughbred,racehorse" -o public/images/pony-010.jpg
-curl -L "https://loremflickr.com/800/600/mare,thoroughbred-horse" -o public/images/pony-011.jpg
-curl -L "https://loremflickr.com/800/600/hackney-pony,show-horse" -o public/images/pony-012.jpg
-
+echo ""
 echo "Image download complete!"
 echo "Images saved to public/images/"
+echo ""
+echo "NOTE: These are generic placeholder images."
+echo "Replace them with actual horse/pony images for production use."
