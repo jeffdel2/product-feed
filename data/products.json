@@ -9,8 +9,8 @@
         "currency": "USD"
       },
       "availability": "in_stock",
-      "link": "http://localhost:3001/products/pony-001",
-      "image_link": "http://localhost:3001/images/pony-001.jpg",
+      "link": "placeholder",
+      "image_link": "placeholder",
       "brand": "Premium Ponies",
       "category": "Livestock > Equine > Miniature",
       "condition": "new"
@@ -24,8 +24,8 @@
         "currency": "USD"
       },
       "availability": "in_stock",
-      "link": "http://localhost:3001/products/pony-002",
-      "image_link": "http://localhost:3001/images/pony-002.jpg",
+      "link": "placeholder",
+      "image_link": "placeholder",
       "brand": "Highland Stables",
       "category": "Livestock > Equine > Shetland",
       "condition": "new"

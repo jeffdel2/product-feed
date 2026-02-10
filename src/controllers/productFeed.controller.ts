@@ -1,8 +1,17 @@
 import { Request, Response } from 'express';
 import productFeedService from '../services/productFeed.service';
 import { Product } from '../types/ucp.types';
+import { getBaseUrl } from '../utils/urlBuilder';
 
 export class ProductFeedController {
+  private transformProductUrls(req: Request, product: Product): Product {
+    const baseUrl = getBaseUrl(req);
+    return {
+      ...product,
+      link: `${baseUrl}/products/${product.id}`,
+      image_link: `${baseUrl}/images/${product.id}.jpg`,
+    };
+  }
   async addProducts(req: Request, res: Response): Promise<void> {
     try {
       const { products } = req.body;
@@ -41,7 +50,7 @@ export class ProductFeedController {
 
       res.json({
         success: true,
-        product,
+        product: this.transformProductUrls(req, product),
       });
     } catch (error) {
       res.status(500).json({
@@ -54,10 +63,11 @@ export class ProductFeedController {
   async getAllProducts(req: Request, res: Response): Promise<void> {
     try {
       const products = await productFeedService.getAllProducts();
+      const transformedProducts = products.map(p => this.transformProductUrls(req, p));
       res.json({
         success: true,
-        count: products.length,
-        products,
+        count: transformedProducts.length,
+        products: transformedProducts,
       });
     } catch (error) {
       res.status(500).json({
@@ -85,7 +95,7 @@ export class ProductFeedController {
       res.json({
         success: true,
         message: 'Product updated successfully',
-        product: updatedProduct,
+        product: this.transformProductUrls(req, updatedProduct),
       });
     } catch (error) {
       res.status(500).json({
