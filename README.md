@@ -7,10 +7,13 @@ A Node.js web service implementing the Google Universal Commerce Protocol (UCP) 
 - RESTful API for product feed management
 - TypeScript for type safety
 - Express.js web framework
+- Supabase PostgreSQL database for product storage
 - Product validation and error handling
+- Dynamic URL generation based on request host
 - Health check and UCP profile endpoints
 - CORS and security headers (Helmet)
 - Request logging middleware
+- Static image serving
 
 ## Project Structure
 
@@ -47,7 +50,14 @@ product-feed/
    PORT=3000
    NODE_ENV=development
    MERCHANT_ID=your_merchant_id
+   SUPABASE_URL=your_supabase_project_url
+   SUPABASE_ANON_KEY=your_supabase_anon_key
    ```
+
+4. Set up Supabase database:
+   - Follow the instructions in [SUPABASE_SETUP.md](./SUPABASE_SETUP.md)
+   - Create the products table using the provided SQL schema
+   - Update your `.env` with Supabase credentials
 
 ## Running the Service
 

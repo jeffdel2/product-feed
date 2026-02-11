@@ -10,4 +10,8 @@ export const config = {
     publicKeyPath: process.env.UCP_PUBLIC_KEY_PATH || './keys/public.pem',
     privateKeyPath: process.env.UCP_PRIVATE_KEY_PATH || './keys/private.pem',
   },
+  supabase: {
+    url: process.env.SUPABASE_URL || '',
+    anonKey: process.env.SUPABASE_ANON_KEY || '',
+  },
 };

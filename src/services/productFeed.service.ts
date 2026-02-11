@@ -1,55 +1,39 @@
 import { Product, ProductFeedResponse } from '../types/ucp.types';
-import * as fs from 'fs/promises';
-import * as path from 'path';
+import { supabase } from '../config/supabase';
 
 class ProductFeedService {
-  private products: Map<string, Product> = new Map();
-  private dataFilePath = path.join(__dirname, '../../data/products.json');
-  private initialized = false;
-
-  private async ensureInitialized(): Promise<void> {
-    if (!this.initialized) {
-      await this.loadData();
-      this.initialized = true;
-    }
-  }
-
-  private async loadData(): Promise<void> {
-    try {
-      const data = await fs.readFile(this.dataFilePath, 'utf-8');
-      const json = JSON.parse(data);
-      this.products.clear();
-      for (const product of json.products) {
-        this.products.set(product.id, product);
-      }
-      console.log(`Loaded ${this.products.size} products from file`);
-    } catch (error) {
-      console.log('No existing data file found or error reading file, starting with empty catalog');
-      this.products.clear();
-    }
-  }
-
-  private async saveData(): Promise<void> {
-    try {
-      const products = Array.from(this.products.values());
-      const data = JSON.stringify({ products }, null, 2);
-      await fs.mkdir(path.dirname(this.dataFilePath), { recursive: true });
-      await fs.writeFile(this.dataFilePath, data, 'utf-8');
-    } catch (error) {
-      console.error('Error saving data:', error);
-      throw new Error('Failed to save product data');
-    }
-  }
+  private readonly tableName = 'products';
 
   async addProducts(products: Product[]): Promise<ProductFeedResponse> {
-    await this.ensureInitialized();
     const errors: Array<{ productId: string; error: string }> = [];
     let itemsProcessed = 0;
 
     for (const product of products) {
       try {
         this.validateProduct(product);
-        this.products.set(product.id, product);
+
+        // Upsert product (insert or update if exists)
+        const { error } = await supabase
+          .from(this.tableName)
+          .upsert({
+            id: product.id,
+            title: product.title,
+            description: product.description,
+            price: product.price,
+            availability: product.availability,
+            link: product.link,
+            image_link: product.image_link,
+            brand: product.brand,
+            gtin: product.gtin,
+            mpn: product.mpn,
+            condition: product.condition,
+            category: product.category,
+          });
+
+        if (error) {
+          throw error;
+        }
+
         itemsProcessed++;
       } catch (error) {
         errors.push({
@@ -58,8 +42,6 @@ class ProductFeedService {
         });
       }
     }
-
-    await this.saveData();
 
     return {
       success: errors.length === 0,
@@ -70,36 +52,77 @@ class ProductFeedService {
   }
 
   async getProduct(productId: string): Promise<Product | null> {
-    await this.ensureInitialized();
-    return this.products.get(productId) || null;
-  }
+    const { data, error } = await supabase
+      .from(this.tableName)
+      .select('*')
+      .eq('id', productId)
+      .single();
 
-  async getAllProducts(): Promise<Product[]> {
-    await this.ensureInitialized();
-    return Array.from(this.products.values());
-  }
-
-  async updateProduct(productId: string, updates: Partial<Product>): Promise<Product | null> {
-    await this.ensureInitialized();
-    const product = this.products.get(productId);
-    if (!product) {
+    if (error || !data) {
       return null;
     }
 
-    const updatedProduct = { ...product, ...updates, id: product.id };
+    return data as Product;
+  }
+
+  async getAllProducts(): Promise<Product[]> {
+    const { data, error } = await supabase
+      .from(this.tableName)
+      .select('*')
+      .order('id', { ascending: true });
+
+    if (error || !data) {
+      return [];
+    }
+
+    return data as Product[];
+  }
+
+  async updateProduct(productId: string, updates: Partial<Product>): Promise<Product | null> {
+    // First, get the existing product
+    const existingProduct = await this.getProduct(productId);
+    if (!existingProduct) {
+      return null;
+    }
+
+    // Merge updates with existing product
+    const updatedProduct = { ...existingProduct, ...updates, id: productId };
     this.validateProduct(updatedProduct);
-    this.products.set(productId, updatedProduct);
-    await this.saveData();
-    return updatedProduct;
+
+    // Update in Supabase
+    const { data, error } = await supabase
+      .from(this.tableName)
+      .update({
+        title: updatedProduct.title,
+        description: updatedProduct.description,
+        price: updatedProduct.price,
+        availability: updatedProduct.availability,
+        link: updatedProduct.link,
+        image_link: updatedProduct.image_link,
+        brand: updatedProduct.brand,
+        gtin: updatedProduct.gtin,
+        mpn: updatedProduct.mpn,
+        condition: updatedProduct.condition,
+        category: updatedProduct.category,
+      })
+      .eq('id', productId)
+      .select()
+      .single();
+
+    if (error || !data) {
+      return null;
+    }
+
+    return data as Product;
   }
 
   async deleteProduct(productId: string): Promise<boolean> {
-    await this.ensureInitialized();
-    const deleted = this.products.delete(productId);
-    if (deleted) {
-      await this.saveData();
-    }
-    return deleted;
+    const { error } = await supabase
+      .from(this.tableName)
+      .delete()
+      .eq('id', productId);
+
+    return !error;
   }
 
   private validateProduct(product: Product): void {
