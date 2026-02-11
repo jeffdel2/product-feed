@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import productFeedService from '../services/productFeed.service';
 import { Product } from '../types/ucp.types';
-import { getBaseUrl } from '../utils/urlBuilder';
+import { getBaseUrl, buildImageUrl } from '../utils/urlBuilder';
 
 export class ProductFeedController {
   private transformProductUrls(req: Request, product: Product): Product {
@@ -9,7 +9,7 @@ export class ProductFeedController {
     return {
       ...product,
       link: `${baseUrl}/products/${product.id}`,
-      image_link: `${baseUrl}/images/${product.id}.jpg`,
+      image_link: buildImageUrl(product.id),
     };
   }
   async addProducts(req: Request, res: Response): Promise<void> {
